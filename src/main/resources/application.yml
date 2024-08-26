@@ -1,0 +1,8 @@
+server:
+  port: 4444
+
+spring:
+  data:
+    mongodb:
+      database: running_tracker
+      uri: mongodb://localhost:27017/running_tracker
