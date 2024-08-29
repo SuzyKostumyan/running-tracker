@@ -10,7 +10,9 @@ import running.tracker.model.Run;
 import running.tracker.repository.RunRepository;
 
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -171,7 +173,7 @@ public class RunServiceImpl implements RunService {
         log.debug("User ID: {} - Number of runs: {}, Total distance: {}, Average speed: {}",
                 request.getUserId(), numberOfRuns, totalDistance, averageSpeed);
 
-        return buildUserStatisticsResponse(numberOfRuns, totalDistance, averageSpeed);
+        return buildUserStatisticsResponse(request.getUserId(), numberOfRuns, totalDistance, averageSpeed);
     }
 
     private long calculateNumberOfRuns(List<Run> runs) {
@@ -179,7 +181,12 @@ public class RunServiceImpl implements RunService {
     }
 
     private double calculateTotalDistance(List<Run> runs) {
-        return runs.stream().mapToDouble(Run::getDistance).sum();
+        return Optional.ofNullable(runs)
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .filter(run -> run.getDistance() != null)
+                .mapToDouble(Run::getDistance)
+                .sum();
     }
 
     private double calculateAverageSpeed(List<Run> runs, double totalDistance) {
@@ -190,8 +197,9 @@ public class RunServiceImpl implements RunService {
         return totalDurationSeconds > 0 ? totalDistance / totalDurationSeconds : 0;
     }
 
-    private UserStatisticsResponse buildUserStatisticsResponse(long numberOfRuns, double totalDistance, double averageSpeed) {
+    private UserStatisticsResponse buildUserStatisticsResponse(String userId, long numberOfRuns, double totalDistance, double averageSpeed) {
         UserStatisticsResponse response = new UserStatisticsResponse();
+        response.setUserId(userId);
         response.setNumberOfRuns(numberOfRuns);
         response.setTotalDistance(totalDistance);
         response.setAverageSpeed(averageSpeed);

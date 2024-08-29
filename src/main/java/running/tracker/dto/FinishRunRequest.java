@@ -1,11 +1,13 @@
 package running.tracker.dto;
 
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
+@AllArgsConstructor
 public class FinishRunRequest {
 
     @NotNull(message = "User ID is mandatory")
